@@ -21,7 +21,10 @@ echo "🚀 Starting deployment for $BINARY_NAME (Target: $DOTNET_VERSION)..."
 mkdir -p "$RUNTIME_DIR"
 
 # 2. Update Source
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
 git pull --ff
+cd - > /dev/null
 
 # 3. Build and Publish
 dotnet publish -c Release
@@ -42,6 +45,7 @@ cp -r "bin/Release/${DOTNET_VERSION}/publish/." "$RUNTIME_DIR/"
 chmod +x "$RUNTIME_DIR/$BINARY_NAME"
 
 # 7. Git Sync
+cd "$REPO_ROOT"  # Use the variable we defined earlier
 git add .
 git commit -m "Deployment sync: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit."
 git push
