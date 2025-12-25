@@ -18,6 +18,7 @@ if (!authSection.Exists()) throw new Exception("CRITICAL: AuthConfig section is 
 
 string expectedUser = authSection["Username"]!;
 string expectedPass = authSection["Password"]!;
+string targetDbName = authSection["TargetDB"]!;
 string autoLoginSecret = authSection["AutoLoginSecret"]!;
 
 // --- 2. Services ---
@@ -112,15 +113,15 @@ public class DbLogger
     private void Init()
     {
         using var c = new SqlConnection(_conn); c.Open();
-        new SqlCommand("IF NOT EXISTS (SELECT * FROM sys.databases WHERE name='MyDockerWebUI') CREATE DATABASE [MyDockerWebUI]", c).ExecuteNonQuery();
-        c.ChangeDatabase("MyDockerWebUI");
+        new SqlCommand("IF NOT EXISTS (SELECT * FROM sys.databases WHERE name='"+targetDbName+"') CREATE DATABASE ["+targetDbName+"]", c).ExecuteNonQuery();
+        c.ChangeDatabase(targetDbName);
         new SqlCommand("IF NOT EXISTS (SELECT * FROM sys.objects WHERE name='ILogging') CREATE TABLE AppLogging (Id INT IDENTITY PRIMARY KEY, Timestamp DATETIME DEFAULT GETUTCDATE(), Level NVARCHAR(50), Message NVARCHAR(MAX), ConnectionId NVARCHAR(100))", c).ExecuteNonQuery();
     }
     public void Log(string level, string msg, string? connId = null)
     {
         try
         {
-            using var c = new SqlConnection(_conn); c.Open(); c.ChangeDatabase("MyDockerWebUI");
+            using var c = new SqlConnection(_conn); c.Open(); c.ChangeDatabase(targetDbName);
             var cmd = new SqlCommand("INSERT INTO ILogging (Level, Message, ConnectionId) VALUES (@l, @m, @c)", c);
             cmd.Parameters.AddWithValue("@l", level); 
             cmd.Parameters.AddWithValue("@m", msg); 
