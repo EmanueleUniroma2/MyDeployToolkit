@@ -8,7 +8,7 @@ find . -type d \( -name "bin" -o -name "obj" -o -name "node_modules" \) -prune -
 # Run the tool
 readmeai --repository "." \
          --api gemini \
-         --model gemini-1.5-flash \
+         --model gemini-3-pro \
          --output "README.md"
 
 # 2. Git Operations
