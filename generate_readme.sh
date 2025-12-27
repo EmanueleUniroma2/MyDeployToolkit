@@ -3,7 +3,7 @@
 # 1. Clean up binaries and dependencies (Root + 1st Level Only)
 # This prevents the AI from analyzing compiled code and saves massive context.
 echo "🧹 Cleaning bin, obj, and node_modules folders..."
-find . -type d \( -name "venv" -o -name "bin" -o -name "obj" -o -name "node_modules" \) -prune -print0 | xargs -0 rm -rf
+find . -type d \( -iname "venv" -o -iname ".venv" -o -iname "bin" -o -iname "obj" -o -iname "node_modules" \) -exec rm -rf {} + 2>/dev/null
 
 # Run the tool
 readmeai --repository "." --api ollama --model llama3 --output "README.md"
